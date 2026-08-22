@@ -31,7 +31,6 @@
   }
   .pixel{font-family:'Press Start 2P', monospace;}
 
-  /* CRT ambiance */
   #crt{
     position:fixed; inset:0; pointer-events:none; z-index:50;
     background:
@@ -53,7 +52,7 @@
       var(--bg);
   }
 
-  /* HUD */
+
   #hud{
     display:flex; align-items:center; justify-content:space-between;
     padding:14px 22px; gap:16px;
@@ -70,7 +69,7 @@
   #progWrap{flex:1; max-width:340px; height:8px; background:#1c1c28; border:1px solid var(--line); border-radius:3px; overflow:hidden;}
   #progBar{height:100%; width:0%; background:linear-gradient(90deg, var(--magenta), var(--cyan)); transition:width .4s ease;}
 
-  /* Stage */
+
   #stageWrap{flex:1; position:relative; display:flex; align-items:center; justify-content:center; padding:20px; overflow:hidden;}
   #floor{
     position:absolute; left:0; right:0; bottom:0; height:26px;
@@ -107,7 +106,6 @@
   .btn.ghost{background:transparent;}
   .btn.fleeing{position:absolute; transition:left .18s ease, top .18s ease;}
 
-  /* Overlays: start / gameover / win */
   .screen{
     position:absolute; inset:0; z-index:20;
     display:flex; align-items:center; justify-content:center; flex-direction:column;
@@ -122,7 +120,7 @@
   .flicker{animation:flicker 3.2s infinite;}
   @keyframes flicker{0%,19%,21%,23%,25%,54%,56%,100%{opacity:1;}20%,24%,55%{opacity:.55;}}
 
-  /* Ambush pop quiz — full-screen, sirens-blaring, no-warning math attack */
+ 
   #ambush{
     position:fixed; inset:0; z-index:40; display:none;
     align-items:center; justify-content:center;
@@ -163,7 +161,7 @@
   #ambushTimerBar{height:100%; width:100%; background:linear-gradient(90deg, var(--green), var(--yellow), var(--red)); background-size:400% 100%; background-position:0% 0;}
   #ambushTimerNum{margin-top:8px; font-size:11px; color:var(--red); letter-spacing:1px;}
 
-  /* Glitch / void / fall trap */
+ 
   #glitch{position:fixed; inset:0; z-index:60; display:none; background:#000; overflow:hidden;}
   #glitch.active{display:block;}
   #glitchNoise{position:absolute; inset:0; opacity:0; background:
@@ -255,7 +253,7 @@
   <footer class="pixel">© RAGE.EXE — NO REFUNDS, NO MERCY, NO SEQUELS</footer>
 </div>
 
-<!-- Sudden pop-quiz ambush -->
+
 <div id="ambush">
   <div id="ambushCard">
     <div id="ambushTitle" class="pixel">⚠ SOLVE OR FALL ⚠</div>
@@ -267,7 +265,7 @@
   </div>
 </div>
 
-<!-- Floor-collapse / glitch trap -->
+
 <div id="glitch">
   <div id="glitchNoise"></div>
   <div id="console"></div>
@@ -279,17 +277,16 @@
 (function(){
   "use strict";
 
-  /* ---------------- State ---------------- */
   const TOTAL_LEVELS = 24;
   const state = {
     level: 0,
     lives: 5,
     score: 0,
-    busy: false,      // true during ambush/glitch, blocks new ambush spam
-    ambushFired: false, // the one-shot ambush already used for this level
+    busy: false,      
+    ambushFired: false,
     ambushTimeout: null,
     ambushInterval: null,
-    activeCleanup: [], // timers/listeners to clear between levels
+    activeCleanup: [],
   };
 
   const el = (id) => document.getElementById(id);
@@ -325,7 +322,6 @@
   }
   function track(fn){ state.activeCleanup.push(fn); }
 
-  /* ---------------- Fake console lines for the glitch trap ---------------- */
   const FAKE_ERRORS = [
     ["> reflex.exe", false],
     ["Uncaught TypeError: brain.think is not a function", true],
@@ -401,7 +397,7 @@
       if(state.lives <= 0){
         gameOver();
       } else {
-        renderLevel(state.level); // retry same level
+        renderLevel(state.level); 
       }
     });
   }
@@ -417,21 +413,12 @@
     }
   }
 
-  /* ---------------- Sudden ambush pop-quiz ----------------
-     Fires EXACTLY ONCE per level, at an unpredictable moment.
-     The countdown is never random — it's a fixed value derived
-     from the current level, and it only ever gets shorter as
-     the game goes on. The numbers also get meaner with level,
-     so the difficulty climbs on two axes at once: less time,
-     harder math. */
 
-  // Deterministic time budget for this level's ambush. Starts
-  // generous, then tightens hard — no per-attempt randomness.
   function ambushDuration(level){
     return Math.max(1500, 6000 - level*190);
   }
 
-  // Deterministic difficulty tier for the numbers/operators.
+ 
   function ambushMath(level){
     const tier = Math.min(3, Math.floor(level/6));
     const ranges = [[2,12],[6,24],[10,38],[16,55]];
@@ -445,9 +432,7 @@
   }
 
   function scheduleAmbush(){
-    if(state.ambushFired) return; // already used its one shot this level
-    // The DELAY before it appears is unpredictable — that's the ambush.
-    // The DURATION once it appears is fixed by level, not random.
+    if(state.ambushFired) return; 
     const delay = 3000 + Math.random()*7000;
     state.ambushTimeout = setTimeout(()=>{
       if(state.busy) return;
@@ -470,7 +455,7 @@
     input.value = '';
     timerBar.style.transition = 'none';
     timerBar.style.backgroundPosition = '0% 0';
-    ambush.classList.remove('active'); void ambush.offsetWidth; // restart flash animation
+    ambush.classList.remove('active'); void ambush.offsetWidth; 
     ambush.classList.add('active');
     setTimeout(()=> input.focus(), 50);
 
@@ -515,9 +500,7 @@
     const timeoutId = setTimeout(()=> resolve(false), DURATION);
   }
 
-  /* ---------------- Level type builders ----------------
-     Each builder(container, cfg) wires up DOM + listeners
-     and calls completeLevel() on success or loseLife() on failure. */
+
 
   function mkBtn(label, cls){
     const b = document.createElement('button');
@@ -549,7 +532,7 @@
       dodges++;
       if(dodges >= needed){
         btn.classList.remove('fleeing');
-        return; // let them click it now
+        return; 
       }
       reposition();
     }
@@ -917,7 +900,7 @@
     track(()=>{ active=false; clearTimeout(t); });
   }
 
-  /* ---------------- Level definitions (24) ---------------- */
+
   const LEVELS = [
     {t:'dodge', title:'LVL 01 — GREET THE BUTTON', instr:'Click the button. It has other plans.', cfg:{label:'CLICK START', dodges:3}},
     {t:'simon', title:'LVL 02 — SIMON SAYS', instr:'Simon says click YES.', cfg:{command:'SIMON SAYS: CLICK "YES"', optionA:'YES', optionB:'NO', correctIsA:true}},
@@ -965,7 +948,7 @@
     scheduleAmbush();
   }
 
-  /* ---------------- Screens ---------------- */
+
   function showScreen(id){
     ['startScreen','gameOverScreen','winScreen'].forEach(s=>{
       el(s).classList.toggle('hidden', s!==id);
